@@ -1,0 +1,4 @@
+interface:
+  display_name: "Anime Face Sculpting"
+  short_description: "Shape anime faces with protected reference landmarks"
+  default_prompt: "Use $anime-face-sculpting to improve primary face forms on a copy and compare fixed-camera renders."

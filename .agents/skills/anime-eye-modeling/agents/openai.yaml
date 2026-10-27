@@ -1,0 +1,4 @@
+interface:
+  display_name: "Anime Eye Modeling"
+  short_description: "Fit anime lids, sclera, iris depth and gaze to references"
+  default_prompt: "Use $anime-eye-modeling to diagnose eye shape and improve the lid, sclera and iris relationship on a copy."

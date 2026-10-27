@@ -1,0 +1,4 @@
+interface:
+  display_name: "Anime Face Topology"
+  short_description: "Build and repair reference-matched anime face loops"
+  default_prompt: "Use $anime-face-topology to inspect and improve facial loops on a separate Blender checkpoint."

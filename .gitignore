@@ -1,0 +1,50 @@
+node_modules/
+dist/
+.DS_Store
+*.blend1
+tools/vrm-addon/
+tools/io_scene_vrm
+tools/*.zip
+assets/base/fem_vroid*
+previews/base-inventory.json
+recordings/
+
+# Local Blender assets and generated results
+/models/
+/assets/
+/previews/
+/tools/
+*.blend
+*.blend[0-9]
+*.vrm
+*.fbx
+*.glb
+*.gltf
+*.mp4
+*.mov
+*.zip
+*.log
+
+# Keep authored experiment code; omit downloaded sources, results and old skill copies.
+/artifacts/**
+!/artifacts/**/
+!/artifacts/**/*.py
+/artifacts/**/review/
+/artifacts/**/prior-skills/
+/artifacts/**/sources/
+/artifacts/**/__pycache__/
+
+# Machine-local environments, credentials and caches
+.venv*/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.publish/
+
+# Unrelated personal interviewing skills
+.agents/skills/grilling/
+.agents/skills/grill-me/

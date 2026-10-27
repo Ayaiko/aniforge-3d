@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blender Tutorial to Practice"
+  short_description: "Review tutorials and verify Blender adaptations"
+  default_prompt: "Use $blender-tutorial-to-practice to review these Blender tutorials, adapt their techniques, and verify a bounded trial on a checkpoint copy."

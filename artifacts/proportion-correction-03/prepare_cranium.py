@@ -1,0 +1,15 @@
+import json,numpy as np
+from pathlib import Path
+R=Path.cwd();O=R/'artifacts/proportion-correction-03';D=json.load(open(R/'artifacts/face-likeness-02/baseline.json'));v=np.array(D['meshes']['Anime013_Head']['vertices']);c=v.copy()
+def ease(x):x=np.clip(x,0,1);return x*x*(3-2*x)
+up=ease((v[:,2]-1.472)/.055);c[:,2]-=.014*up;c[:,0]*=1-.015*up
+back=ease((v[:,1]-.02)/.075)*ease((v[:,2]-1.445)/.06);c[:,1]-=.014*back
+fore=ease((-v[:,1]-.035)/.06)*ease((v[:,2]-1.485)/.065);c[:,1]+=.004*fore
+ids=np.where(np.linalg.norm(c-v,axis=1)>1e-8)[0];changes=[[int(i),*c[i].tolist()] for i in ids];(O/'cranium-coordinates.json').write_text(json.dumps({'vertices':c.tolist(),'changed_indices':ids.tolist(),'max_move_m':float(np.linalg.norm(c-v,axis=1).max())},indent=2))
+contract={'priority':'Overall head proportion, before facial detail','input':'face-likeness-02/before-likeness.blend','intent':'Lower excessive upper cranial height and reduce posterior bulge without changing eyes, lower facial landmarks or connectivity.','crown_lowering_m':.014,'posterior_reduction_max_m':.014,'forehead_recession_max_m':.004,'uncertainty':'Hair hides the actual reference skull. These are documented proportion judgments, not an exact skull trace.','protected':'Head vertices z<=1.445 and all eye/mouth meshes; reference cameras; mesh counts'};(O/'cranium-contract.json').write_text(json.dumps(contract,indent=2))
+prompt='ผมอยากให้ Codex ทำให้มันดูเหมือนตัวละครต้นฉบับแม้จะยังไม่มีสี ไม่มีผม และไม่มี Texture ก่อนครับ'
+code='import bpy,json\nh=bpy.data.objects["Anime013_Head"]\nassert len(h.data.vertices)==946\nchanges='+repr(changes)+'\nfor entry in changes:h.data.vertices[entry[0]].co=entry[1:]\nh.data.update()\nbpy.context.view_layer.update()\nprint(json.dumps({"changed":len(changes),"stage":"cranial-proportion"}))';req=[{'tool':'execute_blender_code','arguments':{'code':code,'user_prompt':prompt},'label':'apply-cranium'}]
+for view in ['front','side','quarter']:
+ code="import bpy\ns=bpy.context.scene\ns.render.engine='BLENDER_WORKBENCH'\ns.display.shading.light='MATCAP'\ns.display.shading.studio_light='clay_studio.exr'\ns.display.shading.color_type='MATERIAL'\ns.view_settings.view_transform='AgX'\ns.view_settings.look='AgX - Medium High Contrast'\ns.camera=bpy.data.objects['REF_"+view+"']\ns.render.filepath="+repr(str(O/'validation'/f'cranium-{view}.png'))+"\nassert bpy.ops.render.render(write_still=True)=={'FINISHED'}\nprint('CRANIUM_"+view+"')";req.append({'tool':'execute_blender_code','arguments':{'code':code,'user_prompt':prompt},'label':'render-cranium-'+view})
+code="import bpy\nbpy.context.scene.camera=bpy.data.objects['REF_quarter']\nbpy.ops.wm.save_as_mainfile(filepath="+repr(str(R/'models/proportion-correction-03/cranium-trial.blend'))+",copy=True)\nprint('SAVED_CRANIUM')";req.append({'tool':'execute_blender_code','arguments':{'code':code,'user_prompt':prompt},'label':'save-cranium'})
+(O/'live-mcp/cranium-request.json').write_text(json.dumps(req,ensure_ascii=False,indent=2));print('changed',len(changes),'max mm',np.linalg.norm(c-v,axis=1).max()*1000)
